@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "WorldGuessr Coordinates",
+  "version": "1.0",
+  "description": "Shows coordinates from WorldGuessr on Google Maps",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.worldguessr.com/*",
+    "https://maps.googleapis.com/*",
+    "https://*.googleapis.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+} 
