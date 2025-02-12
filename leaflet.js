@@ -77,21 +77,12 @@
             
             update(center, zoom) {
                 if (center && this._iframe) {
-                    if (this._url.includes('World_Imagery')) {
-                        const url = `https://www.google.com/maps/embed/v1/view`
-                            + `?key=AIzaSyAa8E9sJS9yVIeN9MGkGcoX4ogqpDJdU84`
-                            + `&center=${center[0]},${center[1]}`
-                            + `&zoom=${zoom}`
-                            + `&maptype=satellite`
-                            + `&language=en`;
-                        this._iframe.src = url;
-                    } else {
                         const url = `https://www.openstreetmap.org/export/embed.html`
                             + `?bbox=${center[1]-0.01},${center[0]-0.01},${center[1]+0.01},${center[0]+0.01}`
                             + `&layer=mapnik&marker=${center[0]},${center[1]}`
                             + `&lang=en`;
                         this._iframe.src = url;
-                    }
+
                 }
             }
             
