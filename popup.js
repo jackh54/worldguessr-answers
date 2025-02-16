@@ -3,17 +3,17 @@ let marker;
 let coordinates = null;
 let debugElement;
 
-// function debug(message) {
-//     if (!debugElement) {
-//         debugElement = document.getElementById('debug');
-//     }
-//     debugElement.innerHTML = message;
-// }
+function debug(message) {
+    if (!debugElement) {
+        debugElement = document.getElementById('debug');
+    }
+    debugElement.innerHTML = message;
+}
 
 async function injectContentScriptAndGetCoordinates() {
     try {
         const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        //debug('Injecting content script...');
+        debug('Injecting content script...');
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             function: function() {
@@ -68,24 +68,30 @@ async function injectContentScriptAndGetCoordinates() {
         
         if (results && results[0] && results[0].result) {
             coordinates = results[0].result;
-            //debug('Coordinates found: ' + JSON.stringify(coordinates));
+            debug('Coordinates found: ' + JSON.stringify(coordinates));
             if (!map) {
                 initMap();
             } else {
                 updateMap();
             }
+            // Enable the open window button
+            document.getElementById('openWindow').disabled = false;
         } else {
-            //debug('No coordinates found in the page');
+            debug('No coordinates found in the page');
             showNoCoordinates();
+            // Disable the open window button
+            document.getElementById('openWindow').disabled = true;
         }
     } catch (error) {
         debug('Error: ' + error.message);
         showNoCoordinates();
+        // Disable the open window button
+        document.getElementById('openWindow').disabled = true;
     }
 }
 
 function initMap() {
-    //debug('Initializing map...');
+    debug('Initializing map...');
     // Default to Paris if no coordinates are available yet
     const defaultLocation = { lat: 48.8566, lng: 2.3522 };
     const location = coordinates || defaultLocation;
@@ -102,7 +108,7 @@ function initMap() {
         if (coordinates) {
             updateMap();
         }
-        //debug('Map initialized successfully');
+        debug('Map initialized successfully');
     } catch (error) {
         debug('Error initializing map: ' + error.message);
     }
@@ -110,7 +116,7 @@ function initMap() {
 
 function updateMap() {
     if (!coordinates) {
-        //debug('No coordinates available for update');
+        debug('No coordinates available for update');
         return;
     }
     
@@ -125,9 +131,9 @@ function updateMap() {
             .bindPopup(`Lat: ${coordinates.lat}<br>Lng: ${coordinates.lng}`)
             .addTo(map);
             
-        //debug('Map updated with new coordinates');
+        debug('Map updated with new coordinates');
     } catch (error) {
-        //debug('Error updating map: ' + error.message);
+        debug('Error updating map: ' + error.message);
     }
 }
 
@@ -135,9 +141,21 @@ function showNoCoordinates() {
     document.getElementById('map').style.display = 'none';
     document.getElementById('no-coordinates').style.display = 'block';
 }
+
+// Add reload button functionality
 document.getElementById('reload').addEventListener('click', function() {
-    //debug('Reloading...');
+    debug('Reloading...');
     injectContentScriptAndGetCoordinates();
 });
-//debug('Extension popup opened');
+
+// Add open window button functionality
+document.getElementById('openWindow').addEventListener('click', function() {
+    if (coordinates) {
+        const windowFeatures = 'width=800,height=600,menubar=no,toolbar=no,location=no,status=no';
+        window.open(`map.html?lat=${coordinates.lat}&lng=${coordinates.lng}`, 'WorldGuessrMap', windowFeatures);
+    }
+});
+
+// Initialize on load
+debug('Extension popup opened');
 injectContentScriptAndGetCoordinates(); 
